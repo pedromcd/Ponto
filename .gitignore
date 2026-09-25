@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment variables and local secrets
+.env
+.env.*
+!.env.example
+
+# Local application data
+dados/*.db
+dados/*.db-*
+dados/*.sqlite
+dados/*.sqlite3
+dados/modelos/
+dados/backups/
+
+# Generic database / SQLite files
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# Exports and backups that may contain employee data
+backups/
+backup/
+exports/
+*.xlsx
+*.csv
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
