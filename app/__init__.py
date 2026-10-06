@@ -1,0 +1,1 @@
+"""Ponto Facial application package."""
