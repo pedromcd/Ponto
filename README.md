@@ -1,141 +1,61 @@
-# Ponto Facial
+# Ponto Facial | Demonstração pública
 
-Sistema web de registro de ponto com reconhecimento facial, desenvolvido em Python com FastAPI, SQLite e InsightFace.
+Aplicação de demonstração para gestão de presença, correção auditável de marcações e fechamento mensal, construída com **Python, FastAPI, SQLite, Jinja2 e OpenPyXL**.
 
-O projeto foi pensado para uso em uma máquina dedicada, como um totem de ponto, permitindo registrar entradas e saídas por reconhecimento facial e acompanhar as marcações ao longo do dia e do período.
+> **Escopo desta versão:** o sistema original foi concebido para reconhecimento facial, mas o código biométrico e os dados de colaboradores não fazem parte desta publicação. Esta versão demonstra os fluxos administrativos com dados totalmente fictícios. **Não é um REP-P homologado e não serve como registro oficial de jornada.** Não está pronta para implantação empresarial sem autenticação apropriada, avaliação de segurança, privacidade e requisitos trabalhistas.
 
 ## Funcionalidades
 
-- cadastro de funcionários com captura facial;
-- registro de entrada e saída por reconhecimento facial;
-- quadro diário com as marcações de cada funcionário;
-- fechamento por período;
-- identificação de dias sem registro e sequências incompletas;
-- inclusão manual de marcações com motivo e autor;
-- desconsideração de marcações sem apagar o registro original;
-- exportação do fechamento em Excel;
-- exportação da relação completa de registros em CSV;
-- suporte a banco SQLite;
-- configuração por variáveis de ambiente.
+- Cadastro e desativação de funcionários fictícios.
+- Visualização diária de marcações e horas computadas.
+- Visão de fechamento por mês e funcionário.
+- Correção manual com motivo e responsável registrados.
+- Desconsideração auditável, sem apagar a marcação original.
+- Exportações CSV e Excel.
+- Dados de teste sem câmera e sem cadastro biométrico.
+- Proteção por token nas operações administrativas fora do modo demonstração (mínimo de demonstração; não substitui autenticação com usuários).
 
-## Tecnologias
+## Como executar
 
-- Python
-- FastAPI
-- Jinja2
-- SQLite
-- InsightFace / ONNX Runtime
-- OpenPyXL
-- HTML, CSS e JavaScript
+Python 3.10+:
 
-## Telas principais
-
-| Rota | Função |
-| --- | --- |
-| `/` | Totem para registrar entrada e saída |
-| `/diario` | Visão das marcações do dia |
-| `/funcionarios` | Cadastro e gerenciamento de funcionários |
-| `/fechamento` | Fechamento e pendências do período |
-| `/fechamento/{id}` | Espelho individual de um funcionário |
-
-## Executar em modo de demonstração
-
-Requer Python 3.10 ou superior.
-
-No Windows:
-
-```powershell
+```bash
 python -m venv .venv
-.venv\Scripts\Activate.ps1
-pip install -r requirements-teste.txt
-
-python semear.py
-$env:PONTO_BANCO="dados/demo.db"
-
-uvicorn app.main:app --port 8000
-```
-
-Depois abra:
-
-```text
-http://localhost:8000/fechamento
-```
-
-O script `semear.py` gera dados fictícios para demonstrar as telas e o fluxo de fechamento sem depender de câmera.
-
-## Executar com reconhecimento facial
-
-Instale todas as dependências:
-
-```powershell
+# Linux/macOS: source .venv/bin/activate
+# Windows PowerShell: .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
-Inicie a aplicação:
+Defina ambiente de demonstração:
 
 ```powershell
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+$env:PONTO_DEMO="1"
+$env:PONTO_DB="data/demo.db"
+python semear.py
+uvicorn app.main:app --reload
 ```
 
-Abra:
+Em Linux/macOS use `export PONTO_DEMO=1` e `export PONTO_DB=data/demo.db`.
 
-```text
-http://localhost:8000
-```
-
-Na primeira utilização do reconhecimento facial, o InsightFace pode baixar os modelos necessários para `dados/modelos/`.
-
-## Configuração
-
-As principais opções são definidas por variáveis de ambiente:
-
-| Variável | Padrão | Descrição |
-| --- | --- | --- |
-| `PONTO_LIMIAR` | `0.45` | Similaridade mínima para reconhecimento |
-| `PONTO_MARGEM` | `0.06` | Diferença mínima entre os dois melhores resultados |
-| `PONTO_CARENCIA` | `60` | Intervalo, em segundos, para repetir o mesmo tipo de marcação |
-| `PONTO_CAPTURAS` | `5` | Quantidade de capturas usadas no cadastro facial |
-| `PONTO_MODELO` | `buffalo_l` | Modelo utilizado pelo InsightFace |
-| `PONTO_DET_SIZE` | `640` | Resolução usada na detecção |
-| `PONTO_AREA_MIN` | `0.020` | Área mínima do rosto no quadro |
-| `PONTO_BANCO` | `dados/ponto.db` | Caminho do banco SQLite |
+Abra http://127.0.0.1:8000/fechamento. Acesse também `/funcionarios`, `/diario` e `/health`.
 
 ## Testes
 
 ```bash
-pip install pytest httpx
-python -m pytest tests/ -v
+pip install -r requirements-dev.txt
+pytest -q
 ```
 
-Os testes do projeto não dependem da câmera.
+## Segurança e privacidade
 
-## Observações
+Não publique `data/*.db`, modelos faciais, imagens de funcionários, credenciais, exportações e backups. Em `PONTO_DEMO=1`, todas as operações administrativas estão abertas propositalmente para teste local. **Não exponha este modo à internet.** Fora do modo demo, escritas e exportações exigem o cabeçalho `X-Admin-Token` configurado por `PONTO_ADMIN_TOKEN`. As páginas de consulta continuam acessíveis; portanto, o projeto não deve ser hospedado com dados pessoais reais.
 
-O sistema foi projetado originalmente para execução local em uma máquina dedicada.
+## Limitações conhecidas
 
-A aplicação não deve ser exposta diretamente à internet sem uma camada adequada de autenticação, autorização e HTTPS.
+- Nenhuma câmera ou reconhecimento facial nesta versão pública.
+- O cálculo das horas usa pares de entrada e saída; não interpreta jornada contratual, feriados, adicionais ou regras legais.
+- Dias sem marcações não são classificados automaticamente como faltas.
+- Sem gestão de usuários ou perfis, proteção CSRF, controle de acesso completo ou trilha imutável.
+- Destinado a demonstração e estudo, não a uso oficial.
 
-O reconhecimento facial também não implementa liveness detection, portanto uma imagem apresentada à câmera pode ser aceita como rosto válido.
-
-Arquivos de banco, modelos, backups, exportações e outros dados locais não devem ser versionados no repositório.
-
-## Estrutura
-
-```text
-app/
-├── main.py
-├── db.py
-├── faces.py
-├── fechamento.py
-├── planilha.py
-├── settings.py
-└── templates/
-
-tests/
-dados/
-instalacao/
-```
-
-## Autor
-
-Pedro Marques Correa Domingues
+Autor: [Pedro Marques Correa Domingues](https://github.com/pedromcd).
