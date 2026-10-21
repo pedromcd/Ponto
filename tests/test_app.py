@@ -25,7 +25,7 @@ def test_add_and_deactivate_employee(client):
 def test_manual_and_export(client):
     client.post("/funcionarios",data={"name":"Pessoa Exemplo","department":"RH"})
     data={"employee_id":"1","day":"2026-10-20","time":"09:00","kind":"entrada","reason":"Teste","actor":"Admin"}
-    assert client.post("/marcacoes",data=data).status_code == 303
+    assert client.post("/marcacoes",data=data,follow_redirects=False).status_code == 303
     csv=client.get("/exportar.csv?month=2026-10")
     assert csv.status_code == 200
     assert "Pessoa Exemplo" in csv.text
