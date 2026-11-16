@@ -1,3 +1,5 @@
+[English](README.en.md) | **Português**
+
 # Ponto Facial | Demonstração pública
 
 Aplicação de demonstração para gestão de presença, correção auditável de marcações e fechamento mensal, construída com **Python, FastAPI, SQLite, Jinja2 e OpenPyXL**.
